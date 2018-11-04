@@ -15,19 +15,20 @@ function run (name, next) {
     const testPathLength = testPath.length
     ls(testPath, (err, tree) => {
       if (err) throw err
-      const testTree = tree.filter((i) => /.*\..+/.test(i))
+      const testTree = tree.filter((i) => /.*\..+/.test(i)).filter(i => !i.endsWith(path.sep))
       const testContent = testTree.map((i) => i.substring(testPathLength))
       const testContentLength = testContent.length
       const outputPath = path.join(__dirname, name, 'output')
       const outputPathLength = outputPath.length
       ls(outputPath, (err, outputTree) => {
         if (err) throw err
-        const outputContent = outputTree.filter((i) => /.*\..+/.test(i))
+        const outputContent = outputTree.filter((i) => /.*\..+/.test(i)).filter(i => !i.endsWith(path.sep))
         const outputContentLength = outputContent.length
         if (testContentLength === outputContentLength) {
           const result = outputContent.reduce((previous, current) => {
             const p = current.substring(outputPathLength)
             const f = testContent.indexOf(p)
+            console.log(p, f, current, outputContent)
             return f > -1 && fs.readFileSync(current).equals(fs.readFileSync(testTree[f])) ? previous + 1 : previous
           }, 0)
           if (result === testContentLength) {
